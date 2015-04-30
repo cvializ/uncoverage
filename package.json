@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "cruft_y": "browserify index.js -t babelify -g [ browserify-istanbul ] -o bundle.js",
-    "cruft": "browserify index.js --debug -t babelify -o bundle.unins.js && istanbul instrument bundle.unins.js > bundle.js",
+    "coverage": "browserify index.js --debug -t babelify -o bundle.unins.js && istanbul instrument bundle.unins.js > bundle.js",
     "build": "browserify index.js --debug -t babelify -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] | exorcist bundle.js.map > bundle.js"
   },
   "author": "",
