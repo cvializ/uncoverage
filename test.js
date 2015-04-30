@@ -4,13 +4,13 @@ var traverse = require('traverse');
 var fs = require('fs');
 var ast = acorn.parse(fs.readFileSync('bundle.unins.js'), {locations: true});
 var coverage = require('./coverage.json');
-var fileRoot = coverage['/Users/cvializ/workspace/poc/closure/bundle.unins.js'];
-var statementMap = fileRoot.statementMap;
-var statements = fileRoot.s;
-var functions = fileRoot.f;
-var branches = fileRoot.b;
+var bundleCoverage = coverage['/Users/cvializ/workspace/poc/closure/bundle.unins.js'];
+var statementMap = bundleCoverage.statementMap;
+var statements = bundleCoverage.s;
+var functions = bundleCoverage.f;
+var branches = bundleCoverage.b;
 
-function getHashCodes(loc) {
+function getPositionKeys(loc) {
     var start = loc.start;
     var end = loc.end;
     var startHash;
@@ -21,10 +21,10 @@ function getHashCodes(loc) {
     };
 }
 
-function getPositionMap(nodes) {
-    return nodes.reduce(function (acc, loc) {
+function getPositionMap(locs) {
+    return locs.reduce(function (acc, loc) {
         if (loc) {
-            var hashCodes = getHashCodes(loc);
+            var hashCodes = getPositionKeys(loc);
             startHash = acc[hashCodes.start] = {};
             startHash[hashCodes.end] = true;
         }
@@ -33,26 +33,33 @@ function getPositionMap(nodes) {
     }, {});
 }
 
-// coverage.json statements are 1-indexed
-var statementIndex = 1;
-var emptyStatementIndices = [];
-while (statements[statementIndex + ''] !== undefined) {
-    if (statements[statementIndex] === 0) {
-        emptyStatementIndices.push(statementIndex);
+function getUncalledCoverageLocations(coverageIndices, coverageLocs) {
+    var uncalledIndices = [];
+    var uncalledLocs;
+    // Get uncalled indices
+    // The istanbul coverage lists are 1-indexed
+    for (var i = 1; coverageIndices[i] !== undefined; i++) {
+        if (coverageIndices[i] === 0) {
+            uncalledIndices.push(i);
+        }
     }
-    statementIndex++;
+
+    // convert indices to matching locations
+    uncalledLocs = uncalledIndices.map(function (uncalledIndex) {
+        return coverageLocs[uncalledIndex + ''];
+    });
+
+    return getPositionMap(uncalledLocs);
 }
 
-var emptyStatements = emptyStatementIndices.map(function (emptyStatementIndex) {
-    return statementMap[emptyStatementIndex + ''];
-});
-
-var emptyStatementMap = getPositionMap(emptyStatements);
+var uncalledStatementMap = getUncalledCoverageLocations(bundleCoverage.s, bundleCoverage.statementMap);
+var uncalledBranchMap = getUncalledCoverageLocations(bundleCoverage.b, bundleCoverage.branchMap);
 
 var newAst = traverse(ast).map(function (node) {
-    if (node && node.type && ~node.type.indexOf('ExpressionStatement')) {
-        var hashCodes = getHashCodes(node.loc);
-        if (emptyStatementMap[hashCodes.start] && emptyStatementMap[hashCodes.start][hashCodes.end]) {
+    if (node && node.type) {
+        var hashCodes = getPositionKeys(node.loc);
+        if ((uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end]) ||
+            (uncalledBranchMap[hashCodes.start] && uncalledBranchMap[hashCodes.start][hashCodes.end])) {
             this.update({
                 type: 'EmptyStatement'
             });
