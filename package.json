@@ -1,0 +1,29 @@
+{
+  "name": "closure",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "cruft_y": "browserify index.js -t babelify -g [ browserify-istanbul ] -o bundle.js",
+    "cruft": "browserify index.js --debug -t babelify -o bundle.unins.js && istanbul instrument bundle.unins.js > bundle.js",
+    "build": "browserify index.js --debug -t babelify -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] | exorcist bundle.js.map > bundle.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "browserify": {
+    "tranform": [
+      "babelify",
+      "uglify"
+    ]
+  },
+  "dependencies": {
+    "babelify": "^6.0.2",
+    "browserify": "^9.0.8",
+    "domready": "^1.0.8",
+    "escodegen": "^1.6.1",
+    "express": "^4.12.3",
+    "react": "^0.13.2",
+    "uglifyify": "^3.0.1"
+  },
+  "es6": true
+}
