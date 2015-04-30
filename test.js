@@ -11,6 +11,8 @@ var functions = bundleCoverage.f;
 var branches = bundleCoverage.b;
 
 function getPositionKeys(loc) {
+    if (loc.loc) loc = loc.loc;
+
     var start = loc.start;
     var end = loc.end;
     var startHash;
@@ -25,8 +27,8 @@ function getPositionMap(locs) {
     return locs.reduce(function (acc, loc) {
         if (loc) {
             var hashCodes = getPositionKeys(loc);
-            startHash = acc[hashCodes.start] = {};
-            startHash[hashCodes.end] = true;
+            acc[hashCodes.start] = {};
+            acc[hashCodes.start][hashCodes.end] = true;
         }
 
         return acc;
@@ -53,16 +55,29 @@ function getUncalledCoverageLocations(coverageIndices, coverageLocs) {
 }
 
 var uncalledStatementMap = getUncalledCoverageLocations(bundleCoverage.s, bundleCoverage.statementMap);
-var uncalledBranchMap = getUncalledCoverageLocations(bundleCoverage.b, bundleCoverage.branchMap);
+var uncalledFunctionMap = getUncalledCoverageLocations(bundleCoverage.f, bundleCoverage.fnMap);
 
 var newAst = traverse(ast).map(function (node) {
     if (node && node.type) {
         var hashCodes = getPositionKeys(node.loc);
-        if ((uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end]) ||
-            (uncalledBranchMap[hashCodes.start] && uncalledBranchMap[hashCodes.start][hashCodes.end])) {
-            this.update({
-                type: 'EmptyStatement'
-            });
+
+        if (~node.type.indexOf('Function')) {
+            // I'm not sure why, but the end doesn't always line up with what coverage says : ?
+            if ((uncalledFunctionMap[hashCodes.start]/* && uncalledFunctionMap[hashCodes.start][hashCodes.end]*/)){
+                this.update({
+                    type: 'Literal',
+                    value: 0,
+                    raw: '0'
+                });
+            }
+        }
+
+        if (~node.type.indexOf('Statement')) {
+            if ((uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end])) {
+                this.update({
+                    type: 'EmptyStatement'
+                });
+            }
         }
     }
 });
