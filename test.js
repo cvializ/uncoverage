@@ -54,8 +54,48 @@ function getUncalledCoverageLocations(coverageIndices, coverageLocs) {
     return getPositionMap(uncalledLocs);
 }
 
+function createEmptyFunction(id, isExpression) {
+    var template = {
+        "start": 0,
+        "loc": {
+            "start": {
+                "line": 1,
+                "column": 0
+            },
+            "end": {
+                "line": 1,
+                "column": 17
+            }
+        },
+        "id": id,
+        "params": [],
+        "body": {
+            "start": 15,
+            "loc": {
+                "start": {
+                    "line": 1,
+                    "column": 15
+                },
+                "end": {
+                    "line": 1,
+                    "column": 17
+                }
+            },
+            "body": [],
+            "type": "BlockStatement",
+            "end": 17
+        },
+        "expression": false,
+        "type": isExpression ? "FunctionExpression" : "FunctionDeclaration",
+        "end": 17
+    };
+
+    return template;
+}
+
 var uncalledStatementMap = getUncalledCoverageLocations(bundleCoverage.s, bundleCoverage.statementMap);
 var uncalledFunctionMap = getUncalledCoverageLocations(bundleCoverage.f, bundleCoverage.fnMap);
+// branches will need some massaging first
 
 var newAst = traverse(ast).map(function (node) {
     if (node && node.type) {
@@ -64,15 +104,15 @@ var newAst = traverse(ast).map(function (node) {
         if (~node.type.indexOf('Function')) {
             // I'm not sure why, but the end doesn't always line up with what coverage says : ?
             if ((uncalledFunctionMap[hashCodes.start]/* && uncalledFunctionMap[hashCodes.start][hashCodes.end]*/)){
-                this.update({
-                    type: 'Literal',
-                    value: 0,
-                    raw: '0'
-                });
-            }
-        }
+                var isExpression = true;
 
-        if (~node.type.indexOf('Statement')) {
+                if (~node.type.indexOf('Declaration')) {
+                    isExpression = false;
+                }
+
+                this.update(createEmptyFunction(node.id, isExpression));
+            }
+        } else if (~node.type.indexOf('Statement')) {
             if ((uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end])) {
                 this.update({
                     type: 'EmptyStatement'
