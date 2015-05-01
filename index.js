@@ -2,7 +2,6 @@ var acorn = require('acorn');
 var escodegen = require('escodegen');
 var traverse = require('traverse');
 var fs = require('fs');
-var through = require('through');
 
 function getPositionKeys(loc) {
     if (loc.loc) loc = loc.loc;
@@ -86,6 +85,11 @@ function convertHash(hash) {
 }
 
 function uncoverage(code, coverage) {
+    // If the args are filenames, get the file contents
+    if (fs.existsSync(code)) code = fs.readFileSync(code);
+    if (fs.existsSync(coverage)) coverage = fs.readFileSync(coverage);
+
+
     var bundleCoverage = coverage[Object.keys(coverage)[0]];
     var uncalledStatementMap = getUncalledCoverageLocations(convertHash(bundleCoverage.s), convertHash(bundleCoverage.statementMap));
     var uncalledFunctionMap = getUncalledCoverageLocations(convertHash(bundleCoverage.f), convertHash(bundleCoverage.fnMap));
@@ -120,26 +124,4 @@ function uncoverage(code, coverage) {
     return escodegen.generate(newAst);
 }
 
-function transform(file, options) {
-    options = options || {};
-    options.coverage = options.coverage || './coverage.json';
-
-    console.dir(options);
-
-    var data = '';
-
-    return through(write, end);
-
-    function write(buf) {
-        data += buf;
-    }
-
-    function end() {
-        var coverage = JSON.parse(fs.readFileSync(options.coverage));
-
-        this.queue(uncoverage(data, coverage));
-        return this.queue(null);
-    }
-}
-
-module.exports = transform;
+module.exports = uncoverage;

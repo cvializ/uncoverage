@@ -8,7 +8,7 @@
     "coverage": "browserify app.js -p browserify-derequire -t babelify -o bundle.unins.js && istanbul instrument bundle.unins.js > bundle.js",
     "build": "browserify app.js --debug -t babelify -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] | exorcist bundle.js.map > bundle.js",
     "start": "node server",
-    "uncoverage": "browserify bundle.unins.js -t ./ -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] -o bundle.min.js"
+    "uncoverage": "browserify bundle.unins.js -t ./transform -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] -o bundle.min.js"
   },
   "author": "",
   "license": "MIT",
