@@ -88,25 +88,8 @@ function convertHash(hash) {
     });
 }
 
-// Branches need some massaging first
-var flatB = convertHash(bundleCoverage.b).reduce(function (acc, node) {
-    acc = acc.concat(node);
-    return acc;
-}, []);
-var flatBranchMap = convertHash(bundleCoverage.branchMap).reduce(function (acc, node) {
-    var t = traverse(node);
-    var consequent = t.clone();
-    var alternate = t.clone();
-
-    consequent.loc = consequent.locations[0];
-    alternate.loc = alternate.locations[1];
-    acc.push(consequent, alternate);
-    return acc;
-}, []);
-
 var uncalledStatementMap = getUncalledCoverageLocations(convertHash(bundleCoverage.s), convertHash(bundleCoverage.statementMap));
 var uncalledFunctionMap = getUncalledCoverageLocations(convertHash(bundleCoverage.f), convertHash(bundleCoverage.fnMap));
-var uncalledBranchMap = getUncalledCoverageLocations(flatB, flatBranchMap);
 
 var newAst = traverse(ast).map(function (node) {
     if (node && node.type) {
