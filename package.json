@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf bundle*.js coverage.json",
     "coverage": "browserify index.js --debug -t babelify -o bundle.unins.js && istanbul instrument bundle.unins.js > bundle.js",
-    "build": "browserify index.js --debug -t babelify -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] | exorcist bundle.js.map > bundle.js"
+    "build": "browserify index.js --debug -t babelify -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] | exorcist bundle.js.map > bundle.js",
+    "server": "node server",
+    "start": "node uncoverage",
+    "uglify": "uglifyjs bundle.min.js -o bundle.min.min.js --mangle toplevel,eval --compress unsafe"
   },
   "author": "",
   "license": "ISC",
@@ -16,12 +20,16 @@
     ]
   },
   "dependencies": {
+    "acorn": "^1.0.3",
     "babelify": "^6.0.2",
     "browserify": "^9.0.8",
     "domready": "^1.0.8",
     "escodegen": "^1.6.1",
     "express": "^4.12.3",
+    "istanbul-middleware": "^0.2.0",
+    "portscanner": "^1.0.0",
     "react": "^0.13.2",
+    "traverse": "^0.6.6",
     "uglifyify": "^3.0.1"
   },
   "es6": true

@@ -2,13 +2,10 @@ var acorn = require('acorn');
 var escodegen = require('escodegen');
 var traverse = require('traverse');
 var fs = require('fs');
+
 var ast = acorn.parse(fs.readFileSync('bundle.unins.js'), {locations: true});
 var coverage = require('./coverage.json');
-var bundleCoverage = coverage['/Users/cvializ/workspace/poc/closure/bundle.unins.js'];
-var statementMap = bundleCoverage.statementMap;
-var statements = bundleCoverage.s;
-var functions = bundleCoverage.f;
-var branches = bundleCoverage.b;
+var bundleCoverage = coverage[Object.keys(coverage)[0]];
 
 function getPositionKeys(loc) {
     if (loc.loc) loc = loc.loc;
