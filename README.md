@@ -15,19 +15,30 @@ the size of the demo bundle before and after removing unused code.
 
     `npm install`
 
-1. Open your terminal and run `npm run coverage && npm run server`.
+1. Open your terminal and run `npm run coverage && npm run start`.
 This will build the bundle and start the demo server
 
 2. Next, navigate your browser to the demo page (probably `localhost:9000`).
 
 3. Look at the page and click the `Save Coverage to file` button.
 
-4. Next enter `run npm start` in the terminal. This step generates `bundle.min.js`
+4. Next enter `npm run uncoverage in the terminal. This step generates `bundle.min.js`
 
 5. Now run `npm run bundle` to generate `bundle.js` with standard minification.
 
 6. Compare the size of `bundle.min.js` and `bundle.js`.
 
-7. But wait, there's more! `bundle.min.js` hasn't been uglified. Run `npm run uglify` to minify it.
+7. Stand in awe of how wicked-awful this idea is!
 
-8. Now compare the sizes of `bundle.min.min.js` and `bundle.js` and stand in awe of how awful this idea is.
+About
+-----
+
+Your web app builds use a lot of libraries, and you probably don't use every
+piece of every library. So why should you ship code your users won't run?
+
+You don't have to!
+
+Just exhaustively run through all the use cases of your app with the
+coverage-instrumented code using Istanbul, then generate the coverage.json.
+`coverage.json` tells `uncoverage` which code you're using, and which code is
+just dead weight.

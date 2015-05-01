@@ -2,10 +2,7 @@ var acorn = require('acorn');
 var escodegen = require('escodegen');
 var traverse = require('traverse');
 var fs = require('fs');
-
-var ast = acorn.parse(fs.readFileSync('bundle.unins.js'), {locations: true});
-var coverage = require('./coverage.json');
-var bundleCoverage = coverage[Object.keys(coverage)[0]];
+var through = require('through');
 
 function getPositionKeys(loc) {
     if (loc.loc) loc = loc.loc;
@@ -88,33 +85,61 @@ function convertHash(hash) {
     });
 }
 
-var uncalledStatementMap = getUncalledCoverageLocations(convertHash(bundleCoverage.s), convertHash(bundleCoverage.statementMap));
-var uncalledFunctionMap = getUncalledCoverageLocations(convertHash(bundleCoverage.f), convertHash(bundleCoverage.fnMap));
+function uncoverage(code, coverage) {
+    var bundleCoverage = coverage[Object.keys(coverage)[0]];
+    var uncalledStatementMap = getUncalledCoverageLocations(convertHash(bundleCoverage.s), convertHash(bundleCoverage.statementMap));
+    var uncalledFunctionMap = getUncalledCoverageLocations(convertHash(bundleCoverage.f), convertHash(bundleCoverage.fnMap));
 
-var newAst = traverse(ast).map(function (node) {
-    if (node && node.type) {
-        var hashCodes = getPositionKeys(node.loc);
+    var ast = acorn.parse(code, {locations: true});
 
-        if (~node.type.indexOf('Function')) {
-            // I'm not sure why, but the end doesn't always line up with what coverage says : ?
-            if (uncalledFunctionMap[hashCodes.start]/* && uncalledFunctionMap[hashCodes.start][hashCodes.end]*/) {
-                var isExpression;
+    var newAst = traverse(ast).map(function (node) {
+        if (node && node.type) {
+            var hashCodes = getPositionKeys(node.loc);
 
-                if (~node.type.indexOf('Expression')) {
-                    isExpression = true;
+            if (~node.type.indexOf('Function')) {
+                // I'm not sure why, but the end doesn't always line up with what coverage says : ?
+                if (uncalledFunctionMap[hashCodes.start]/* && uncalledFunctionMap[hashCodes.start][hashCodes.end]*/) {
+                    var isExpression;
+
+                    if (~node.type.indexOf('Expression')) {
+                        isExpression = true;
+                    }
+
+                    this.update(createEmptyFunction(node.id, isExpression));
                 }
-
-                this.update(createEmptyFunction(node.id, isExpression));
-            }
-        } else if (~node.type.indexOf('Statement')) {
-            if (uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end]) {
-                this.update({
-                    type: 'EmptyStatement'
-                });
+            } else if (~node.type.indexOf('Statement')) {
+                if (uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end]) {
+                    this.update({
+                        type: 'EmptyStatement'
+                    });
+                }
             }
         }
-    }
-});
+    });
 
-fs.writeFileSync('bundle.ecg.js', escodegen.generate(ast));
-fs.writeFileSync('bundle.min.js', escodegen.generate(newAst));
+    return escodegen.generate(newAst);
+}
+
+function transform(file, options) {
+    options = options || {};
+    options.coverage = options.coverage || './coverage.json';
+
+    console.dir(options);
+
+    var data = '';
+
+    return through(write, end);
+
+    function write(buf) {
+        data += buf;
+    }
+
+    function end() {
+        var coverage = JSON.parse(fs.readFileSync(options.coverage));
+
+        this.queue(uncoverage(data, coverage));
+        return this.queue(null);
+    }
+}
+
+module.exports = transform;
