@@ -33,20 +33,12 @@ function getPositionMap(locs) {
 }
 
 function getUncalledCoverageLocations(coverageIndices, coverageLocs) {
-    var uncalledIndices = [];
-    var uncalledLocs;
-    // Get uncalled indices
-    // The istanbul coverage lists are 1-indexed
-    for (var i = 1; coverageIndices[i] !== undefined; i++) {
-        if (coverageIndices[i] === 0) {
-            uncalledIndices.push(i);
+    var uncalledLocs = coverageIndices.map(function (coverageAtIndex, i) {
+        if (coverageAtIndex === 0) {
+            // coverageIndex is an uncalled index
+            return coverageLocs[i]; // i is important here, because the arrays are associated.
         }
-    }
-
-    // convert indices to matching locations
-    uncalledLocs = uncalledIndices.map(function (uncalledIndex) {
-        return coverageLocs[uncalledIndex];
-    });
+    }).filter(Boolean);
 
     return getPositionMap(uncalledLocs);
 }
@@ -90,27 +82,30 @@ function createEmptyFunction(id, isExpression) {
     return template;
 }
 
+function convertHash(hash) {
+    return Object.keys(hash).map(function (key) {
+        return hash[key];
+    });
+}
+
 // Branches need some massaging first
-bundleCoverage.b.length = 9999999999; // do this so Array.reduce works : )
-bundleCoverageMap.length = 9999999999;
-var flatB = Array.prototype.reduce.call(bundleCoverage.b, function (acc, node) {
+var flatB = convertHash(bundleCoverage.b).reduce(function (acc, node) {
     acc = acc.concat(node);
     return acc;
 }, []);
-var flatBranchMap = Array.prototype.reduce.call(bundleCoverage.branchMap, function (acc, node) {
+var flatBranchMap = convertHash(bundleCoverage.branchMap).reduce(function (acc, node) {
     var t = traverse(node);
-    var left = t.clone();
-    var right = t.clone();
+    var consequent = t.clone();
+    var alternate = t.clone();
 
-    left.loc = left.locations[0];
-    right.loc = right.locations[1];
-    acc.push(left, right);
+    consequent.loc = consequent.locations[0];
+    alternate.loc = alternate.locations[1];
+    acc.push(consequent, alternate);
     return acc;
 }, []);
 
-var uncalledStatementMap = getUncalledCoverageLocations(bundleCoverage.s, bundleCoverage.statementMap);
-var uncalledFunctionMap = getUncalledCoverageLocations(bundleCoverage.f, bundleCoverage.fnMap);
-
+var uncalledStatementMap = getUncalledCoverageLocations(convertHash(bundleCoverage.s), convertHash(bundleCoverage.statementMap));
+var uncalledFunctionMap = getUncalledCoverageLocations(convertHash(bundleCoverage.f), convertHash(bundleCoverage.fnMap));
 var uncalledBranchMap = getUncalledCoverageLocations(flatB, flatBranchMap);
 
 var newAst = traverse(ast).map(function (node) {
@@ -119,7 +114,7 @@ var newAst = traverse(ast).map(function (node) {
 
         if (~node.type.indexOf('Function')) {
             // I'm not sure why, but the end doesn't always line up with what coverage says : ?
-            if ((uncalledFunctionMap[hashCodes.start]/* && uncalledFunctionMap[hashCodes.start][hashCodes.end]*/)){
+            if (uncalledFunctionMap[hashCodes.start]/* && uncalledFunctionMap[hashCodes.start][hashCodes.end]*/) {
                 var isExpression;
 
                 if (~node.type.indexOf('Expression')) {
@@ -129,7 +124,7 @@ var newAst = traverse(ast).map(function (node) {
                 this.update(createEmptyFunction(node.id, isExpression));
             }
         } else if (~node.type.indexOf('Statement')) {
-            if ((uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end])) {
+            if (uncalledStatementMap[hashCodes.start] && uncalledStatementMap[hashCodes.start][hashCodes.end]) {
                 this.update({
                     type: 'EmptyStatement'
                 });
