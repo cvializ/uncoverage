@@ -1,18 +1,18 @@
 {
-  "name": "closure",
+  "name": "uncoverage",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf bundle*.js coverage.json",
-    "coverage": "browserify index.js --debug -t babelify -o bundle.unins.js && istanbul instrument bundle.unins.js > bundle.js",
+    "coverage": "browserify index.js -t babelify -o bundle.unins.js && istanbul instrument bundle.unins.js > bundle.js",
     "build": "browserify index.js --debug -t babelify -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] | exorcist bundle.js.map > bundle.js",
     "server": "node server",
     "start": "node uncoverage",
     "uglify": "uglifyjs bundle.min.js -o bundle.min.min.js --mangle toplevel,eval --compress unsafe"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "browserify": {
     "tranform": [
       "babelify",
