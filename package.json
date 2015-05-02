@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "clean": "rm -rf demo-app/bundle*.js demo-app/coverage.json",
+    "clean": "rm -rf demo-app/bundle*.js* demo-app/coverage.json",
     "coverage": "browserify demo-app/app.js -p browserify-derequire -t babelify -o demo-app/bundle.unins.js && istanbul instrument demo-app/bundle.unins.js > demo-app/bundle.js",
     "build": "browserify demo-app/app.js --debug -t babelify -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] | exorcist demo-app/bundle.js.map > demo-app/bundle.js",
     "start": "node server",
-    "uncoverage": "browserify demo-app/bundle.unins.js -t [ ./transform --coverage demo-app/coverage.json ] -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] -o demo-app/bundle.min.js"
+    "uncoverage": "browserify demo-app/bundle.unins.js -t [ ./transform --coverage demo-app/coverage.json ] -g [ uglifyify --screw-ie8 --mangle [ --toplevel --eval ] --compress [ --unsafe ] ] -o demo-app/bundle.min.js",
+    "dalek": "dalek demo-app/dalek.js -b chrome",
+    "flow": "npm run clean && npm run coverage && npm run dalek && npm run uncoverage"
   },
   "author": "",
   "license": "MIT",
@@ -17,6 +19,8 @@
     "babelify": "^6.0.2",
     "browserify": "^9.0.8",
     "browserify-derequire": "^0.9.4",
+    "dalek-browser-chrome": "0.0.11",
+    "dalekjs": "0.0.9",
     "domready": "^1.0.8",
     "escodegen": "^1.6.1",
     "express": "^4.12.3",

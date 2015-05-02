@@ -124,4 +124,6 @@ function uncoverage(code, coverage) {
     return escodegen.generate(newAst);
 }
 
+uncoverage.transform = require('./transform');
+
 module.exports = uncoverage;

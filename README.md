@@ -11,24 +11,24 @@ the size of the demo bundle before and after removing unused code.
 
 0. First install the global and local dependencies:
 
-    `npm install -g browserify uglify-js istanbul exorcist`
+    `npm install -g browserify istanbul exorcist dalek`
 
     `npm install`
 
-1. Open your terminal and run `npm run coverage && npm run start`.
-This will build the bundle and start the demo server
+1. Open your terminal and run `npm run start &`.
+This will run the coverage collecting server. This will receive the coverage results
+from the run, and then save them into a `coverage.json`.
 
-2. Next, navigate your browser to the demo page (probably `localhost:9000/demo-app/`).
+2. Next, run `npm run flow` in the terminal. This will build an instrumented bundle
+to collect coverage, then run the app in Chrome automagically, then send the coverage to
+the server. Then `uncoverage` will remove the code that your app doesn't use!
 
-3. Look at the page and click the `Save Coverage to file` button.
+3. Now run `npm run bundle` to generate `demo-app/bundle.js` with a standard minification process.
+We will use this standard bundle to compare with the uncoveraged bundle.
 
-4. Next enter `npm run uncoverage in the terminal. This step generates `demo-app/bundle.min.js`
+4. Compare the size of the uncoveraged `demo-app/bundle.min.js` and the standard `demo-app/bundle.js`. Try using `ls -lh demo-app` from the project root.
 
-5. Now run `npm run bundle` to generate `demo-app/bundle.js` with a standard minification process.
-
-6. Compare the size of `demo-app/bundle.min.js` and `demo-app/bundle.js`. Try using `ls -lh demo-app` from the project root.
-
-7. Stand in awe of how wicked-awful this idea is!
+5. Stand in awe of how wicked-awful this idea is!
 
 About
 -----
