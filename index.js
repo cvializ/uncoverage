@@ -87,8 +87,7 @@ function convertHash(hash) {
 function uncoverage(code, coverage) {
     // If the args are filenames, get the file contents
     if (fs.existsSync(code)) code = fs.readFileSync(code);
-    if (fs.existsSync(coverage)) coverage = fs.readFileSync(coverage);
-
+    if (fs.existsSync(coverage)) coverage = JSON.parse(fs.readFileSync(coverage));
 
     var bundleCoverage = coverage[Object.keys(coverage)[0]];
     var uncalledStatementMap = getUncalledCoverageLocations(convertHash(bundleCoverage.s), convertHash(bundleCoverage.statementMap));
