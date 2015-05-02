@@ -20,6 +20,7 @@
     "browserify": "^9.0.8",
     "browserify-derequire": "^0.9.4",
     "commander": "^2.8.1",
+    "cors": "^2.6.0",
     "dalek-browser-chrome": "0.0.11",
     "dalekjs": "0.0.9",
     "domready": "^1.0.8",

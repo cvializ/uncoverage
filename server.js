@@ -4,6 +4,7 @@ var program = require('commander');
 var portscanner = require('portscanner');
 var im = require('istanbul-middleware');
 var express = require('express');
+var cors = require('cors');
 var pkg = require('./package.json');
 var app = express();
 
@@ -35,8 +36,9 @@ if (!program.port[0]) {
 }
 
 // add the coverage handler
+app.use(cors());
 app.use(program.coverage, im.createHandler());
-app.post(path.join(program.coverage, 'save'), function (req, res) {
+app.post('/save', function (req, res) {
     req.pipe(fs.createWriteStream(program.output));
     req.on('end', function () {
         res.status(200).end();
