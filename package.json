@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "uncoverage": "./cli.js"
+  },
   "scripts": {
     "clean": "rm -rf demo-app/bundle*.js* demo-app/coverage.json",
     "coverage": "browserify demo-app/app.js -p browserify-derequire -t babelify -o demo-app/bundle.unins.js && istanbul instrument demo-app/bundle.unins.js > demo-app/bundle.js",
