@@ -35,15 +35,18 @@ if (!program.port[0]) {
     program.port[1] = 9999;
 }
 
-// add the coverage handler
 app.use(cors());
-app.use(program.coverage, im.createHandler());
-app.post('/save', function (req, res) {
+
+// Add this first, so this gets the request before
+// the istanbul-middleware consumes it.
+app.post(path.join(program.coverage, 'save'), function (req, res) {
     req.pipe(fs.createWriteStream(program.output));
     req.on('end', function () {
         res.status(200).end();
     });
 });
+// Add the istanbul middleware
+app.use(program.coverage, im.createHandler());
 app.use(express.static(program.directory));
 
 portscanner.findAPortNotInUse(program.port[0], program.port[1] || program.port[0], 'localhost', function (err, port) {

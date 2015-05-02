@@ -16,22 +16,25 @@
   "license": "MIT",
   "dependencies": {
     "acorn": "^1.0.3",
-    "babelify": "^6.0.2",
-    "browserify": "^9.0.8",
-    "browserify-derequire": "^0.9.4",
-    "commander": "^2.8.1",
-    "cors": "^2.6.0",
-    "dalek-browser-chrome": "0.0.11",
-    "dalekjs": "0.0.9",
-    "domready": "^1.0.8",
     "escodegen": "^1.6.1",
-    "express": "^4.12.3",
-    "istanbul-middleware": "^0.2.0",
-    "portscanner": "^1.0.0",
-    "react": "^0.13.2",
+    "event-stream": "^3.3.0",
     "through": "^2.3.7",
-    "traverse": "^0.6.6",
-    "uglifyify": "^3.0.1"
+    "traverse": "^0.6.6"
+  },
+  "devDependencies": {
+      "babelify": "^6.0.2",
+      "browserify-derequire": "^0.9.4",
+      "browserify": "^9.0.8",
+      "commander": "^2.8.1",
+      "cors": "^2.6.0",
+      "dalek-browser-chrome": "0.0.11",
+      "dalekjs": "0.0.9",
+      "domready": "^1.0.8",
+      "express": "^4.12.3",
+      "istanbul-middleware": "^0.2.0",
+      "portscanner": "^1.0.0",
+      "react": "^0.13.2",
+      "uglifyify": "^3.0.1"
   },
   "es6": true
 }
