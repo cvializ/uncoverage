@@ -1,7 +1,7 @@
 {
   "name": "uncoverage",
   "version": "1.0.0",
-  "description": "",
+  "description": "Use Dynamic Dead Code Elimination to super-minify your code",
   "main": "index.js",
   "bin": {
     "uncoverage": "./cli.js"

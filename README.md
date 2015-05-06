@@ -1,7 +1,10 @@
 uncoverage
 ==========
 
-Abuse a code coverage tool to super-minify your code.
+Use [Dynamic Dead Code Elimination](http://en.wikipedia.org/wiki/Dead_code_elimination#Dynamic_dead_code_elimination
+) to super-minify your code.
+
+*this is just a POC, use at your own risk*
 
 Overview
 --------
