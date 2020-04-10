@@ -18,7 +18,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "acorn": "^1.0.3",
+    "acorn": "^7.1.1",
     "escodegen": "^1.6.1",
     "event-stream": "^3.3.0",
     "through": "^2.3.7",
