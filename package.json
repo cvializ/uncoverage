@@ -36,7 +36,7 @@
       "express": "^4.12.3",
       "istanbul-middleware": "^0.2.0",
       "portscanner": "^1.0.0",
-      "react": "^0.13.2",
+      "react": "^16.13.1",
       "uglifyify": "^3.0.1"
   },
   "es6": true
